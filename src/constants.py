@@ -8,6 +8,7 @@ NO_DATA_ERROR = "NO_DATA"
 TRACEPARENT_KEY = "traceparent"
 GET_PUBLIC_KEY_API_URL = "/ums/v1/security/public-key"
 DONE = "DONE"
+PAGE_SIZE = 100
 
 
 def resolve_should_validate(env_var):
@@ -16,8 +17,7 @@ def resolve_should_validate(env_var):
             return False
         else:
             return True
-    else:
-        return True
+    return True
 
 
 cloud_constants = {
@@ -38,7 +38,8 @@ cloud_constants = {
     "ADHERENCE_SESSION_TEMPLATE_NAME": os.getenv("ADHERENCE_SESSION_TEMPLATE_NAME"),
     "ADHERENCE_TIME_IN_DAYS": os.getenv("ADHERENCE_TIME_IN_DAYS"),
     "ALERT_TEMPLATE_NAME": os.getenv("ALERT_TEMPLATE_NAME"),
-    "LAST_SESSION_KEY": os.getenv("LAST_SESSION_KEY") if os.getenv("LAST_SESSION_KEY") is not None else "last_session_time"
+    "LAST_SESSION_KEY": os.getenv("LAST_SESSION_KEY") if os.getenv("LAST_SESSION_KEY") is not None\
+        else "last_session_time"
 }
 
 local_dev_constants = {
