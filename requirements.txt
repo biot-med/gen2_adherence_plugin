@@ -1,0 +1,3 @@
+requests
+python-jose[pycryptodome]
+# You can add here more dependencies that you need that are compatible with the AWS Lambda execution environment.

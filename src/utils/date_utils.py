@@ -4,7 +4,7 @@ def iso_date_x_days_ago(days: int):
     """Get ISO formatted string of a date x days ago.
 
     Args:
-        days (number): The number of days ago.
+        days (int): The number of days ago.
 
     Returns:
         string: The iso formatted string of a date x days ago.
@@ -28,7 +28,7 @@ def iso_string_to_datetime(date_str: str):
     """Get datetime from ISO formatted string.
 
     Args:
-        date_str (string): The ISO formatted string that represents a date.
+        date_str (str): The ISO formatted string that represents a date.
 
     Returns:
         datetime: The datetime from the ISO formatted string.
