@@ -1,7 +1,7 @@
 import json
 from urllib.parse import quote
 
-from src.constants import BIOT_BASE_URL, LAST_SESSION_KEY
+from src.constants import BIOT_BASE_URL, LAST_SESSION_TIME_KEY
 from src.utils import http_utils
 
 def get_patient_by_id(patient_id, token, traceparent):
@@ -73,7 +73,7 @@ def paginate_non_adherent_patients_by_org(org_id, required_last_time, page, limi
             "_ownerOrganization.id": {
                 "eq": org_id
             },
-            LAST_SESSION_KEY: {
+            LAST_SESSION_TIME_KEY: {
                 "to": required_last_time
             }
         },
@@ -103,7 +103,7 @@ def paginate_new_non_adherent_patients_by_org(org_id, required_last_time, page, 
             "_ownerOrganization.id": {
                 "eq": org_id
             },
-            LAST_SESSION_KEY: {
+            LAST_SESSION_TIME_KEY: {
                 "isNull": True
             },
             "_creationTime": {
