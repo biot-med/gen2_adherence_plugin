@@ -30,9 +30,6 @@ cloud_constants = {
     "BIOT_SERVICE_ENVIRONMENT": os.getenv("BIOT_SERVICE_ENVIRONMENT"),
     "HOOKTYPE_PERMISSIONS": {
         "notification": os.getenv("BIOT_JWT_PERMISSION_NOTIFICATION"),
-        "interceptorPost": os.getenv("BIOT_JWT_PERMISSION_INTERCEPTION"),
-        "interceptorPre": os.getenv("BIOT_JWT_PERMISSION_INTERCEPTION"),
-        "interceptorPostEntity": os.getenv("BIOT_JWT_PERMISSION_INTERCEPTION"),
     },
     "JWT_PERMISSION": os.getenv("JWT_PERMISSION"),
     "ADHERENCE_SESSION_TEMPLATE_NAME": os.getenv("ADHERENCE_SESSION_TEMPLATE_NAME"),

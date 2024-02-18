@@ -114,8 +114,12 @@ def create_configuration_payload():
             "interceptionOrder":"1",
             "notifications":[
                 {
-                    "entityTypeName":"generic-entity",
+                    "entityTypeName":"usage-session",
                     "actionName":"_create"
+                },
+                {
+                    "entityTypeName":"usage-session",
+                    "actionName":"_update"
                 }
             ]
         }

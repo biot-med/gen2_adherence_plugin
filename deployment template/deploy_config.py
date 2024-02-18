@@ -24,9 +24,10 @@ deploy_vars = {
 }
 
 env_vars = {
-
     "AWS_EXECUTION_ENV": "<Execution environment on AWS>",
-    "LAST_SESSION_TIME_KEY": "last_session_time",
+    "LAST_SESSION_TIME_KEY": "<The last session time key as it appears in the patient template>",
+    "ADHERENCE_SESSION_TEMPLATE_NAME": "<The template name of the session that requires adherence>",
+    "ADHERENCE_TIME_IN_DAYS": "<Minimum time in days of not doing a session to trigger non-adherence>",
+    "ALERT_TEMPLATE_NAME": "<The template name of the adherence alert>",
     # In a similar manner, add the rest of your lambda's environment variables here.
-
 }
