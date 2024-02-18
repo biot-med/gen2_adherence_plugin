@@ -8,7 +8,7 @@ __pycache__/
 
 seedenv/
 plugin.zip
-./deploy_config.py
+/deploy_config.py
 
 # Distribution / packaging
 .Python

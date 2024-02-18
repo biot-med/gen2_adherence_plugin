@@ -5,11 +5,17 @@ import json
 import traceback
 from urllib.parse import quote
 from distutils.dir_util import copy_tree
+import sys
+
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
 from deploy_config import env_vars, deploy_vars
 
-BASE_URL = 'https://' + env_vars["base_url"]
+BASE_URL = 'https://' + deploy_vars["base_url"]
 DEFAULT_PATIENT_TEMPLATE_NAME = 'Patient'
-SEATCH_TEMPLATE_BY_FILTER_URL = BASE_URL + '/settings/v1/templates?searchRequest='
+SEARCH_TEMPLATE_BY_FILTER_URL = BASE_URL + '/settings/v1/templates?searchRequest='
 LOGIN_URL = BASE_URL + '/ums/v2/users/login'
 TEMPLATE_BY_ID_URL = BASE_URL + '/settings/v1/templates/<templateId>'
 DEPLOY_URL = BASE_URL + "/settings/v1/plugins"
@@ -37,7 +43,7 @@ def find_patient_template(headers):
             "limit": 1,
             "page": 0
         }
-        url = f'{SEATCH_TEMPLATE_BY_FILTER_URL}{quote(json.dumps(searchQuery))}'
+        url = f'{SEARCH_TEMPLATE_BY_FILTER_URL}{quote(json.dumps(searchQuery))}'
         res = requests.get(url, headers=headers)
         if res.status_code == 200:
             data = res.json()['data']
@@ -58,22 +64,42 @@ def update_patient_template(patient_template, headers):
         customAttributes = patient_template.get('customAttributes')\
               if patient_template.get('customAttributes') is not None else []
         
-        if len(filter(lambda e: e["name"] == LAST_SESSION_TIME_KEY, customAttributes)) > 0:
+        if len(list(filter(lambda e: e["name"] == LAST_SESSION_TIME_KEY, customAttributes))) > 0:
             print("Patient template already has a last session time attribute.")
             return
         
+        for attribute in customAttributes:
+            if attribute.get("category") is None:
+                continue
+            attribute["category"] = attribute["category"]["name"]
+        
         customAttributes.append({
-            "name": LAST_SESSION_KEY,
+            "name": LAST_SESSION_TIME_KEY,
             "displayName": "last session time",
-            "category": "Adherence",
+            "category": "REGULAR",
             "type": "DATE_TIME",
         })
 
-        patient_template["customAttributes"] = customAttributes
+        template_attributes = patient_template['templateAttributes']
+        template_attributes[0]['organizationSelectionConfiguration'] = template_attributes[0]['organizationSelection']
+        template_attributes[0]['organizationSelectionConfiguration']['all'] = True
+        template_attributes[0]['value'] = ["SELF","ANONYMOUS"]
+
+        update_body = {
+            'builtInAttributes': patient_template["builtInAttributes"],
+            'templateAttributes': template_attributes,
+            'description': patient_template['description'],
+            'displayName': patient_template['displayName'],
+            'name': patient_template['name'],
+            'ownerOrganizationId': patient_template['ownerOrganizationId'],
+            'parentTemplateId': patient_template['parentTemplateId'],
+            'customAttributes': customAttributes
+        }
+
         id = patient_template['id']
         url = f'{TEMPLATE_BY_ID_URL.replace("<templateId>", id)}'
-        res = requests.put(url, headers=headers, body=patient_template)
-        if res.status != 200:
+        res = requests.put(url, headers=headers, json=update_body)
+        if res.status_code != 200:
             print("ERROR: can't update Patient template")
             raise Exception(f'{res.status_code}: {res.text}')
     except Exception as e:
@@ -87,7 +113,7 @@ def deployment_setup():
         print("Created deployment dir.")
 
     print(f"Installing dependencies at deployment dir.")
-    subprocess.run(f"pip install -r requirements.txt --target ./dist", shell=True)
+    subprocess.run(f"pip install -r requirements.txt --target " + DIST_PATH, shell=True)
     print(f"Installed dependencies at deployment dir.")
 
     print("Copying the plugin into the deployment dir.")
@@ -147,7 +173,6 @@ try:
     headers = {
         "authorization": "Bearer " + access_token
     }
-
 
     patient_template = find_patient_template(headers)
     update_patient_template(patient_template, headers)
