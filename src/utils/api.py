@@ -4,21 +4,6 @@ from urllib.parse import quote
 from src.constants import BIOT_BASE_URL, LAST_SESSION_TIME_KEY
 from src.utils import http_utils
 
-def get_patient_by_id(patient_id, token, traceparent):
-    """Get a patient by their id.
-
-    Args:
-        patient_id (str): The patient's id.
-        token (str): The access token.
-        traceparent (str): The traceparent.
-
-    Returns:
-        dict: The fetched patient entity.
-    """
-
-    url = f"{BIOT_BASE_URL}/organization/v1/users/patients/{patient_id}"
-    return http_utils.get(url, traceparent, token, body={})
-
 def update_patient_by_id(patient_id, payload, token, traceparent):
     """Update a patient by their id.
 

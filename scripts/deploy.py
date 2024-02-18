@@ -117,7 +117,7 @@ def deployment_setup():
     print(f"Installed dependencies at deployment dir.")
 
     print("Copying the plugin into the deployment dir.")
-    copy_tree('./src', DIST_PATH)
+    copy_tree('./src', DIST_PATH + "/src")
     shutil.copyfile("./index.py", DIST_PATH + "/index.py") 
     print("Successfully copied the plugin into the deployment dir.")
 

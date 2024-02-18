@@ -1,7 +1,7 @@
-from utils.api import get_patient_by_id, update_patient_by_id
+from src.utils.api import update_patient_by_id
 from src.utils.configure_logger import logger
 from src.utils.generic_success_response import generic_success_response
-from constants import ADHERENCE_SESSION_TEMPLATE_NAME, DONE, LAST_SESSION_TIME_KEY
+from src.constants import ADHERENCE_SESSION_TEMPLATE_NAME, DONE, LAST_SESSION_TIME_KEY
 
 
 def perform(data, token, traceparent, metadata):
@@ -24,8 +24,7 @@ def perform(data, token, traceparent, metadata):
     
     logger.info("Updating patient last session time.")
     patient_id = session_entity["_patient"]["id"]
-    patient = get_patient_by_id(patient_id, token, traceparent)
-    patient[LAST_SESSION_TIME_KEY] = session_entity["_endTime"]
-    response = update_patient_by_id(patient_id, patient, token, traceparent)
+    update_payload = {LAST_SESSION_TIME_KEY: session_entity["_endTime"] }
+    response = update_patient_by_id(patient_id, update_payload, token, traceparent)
     logger.info("Response of update patients last session use time.", response)
     return generic_success_response(traceparent)
