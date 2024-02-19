@@ -20,7 +20,7 @@ LOGIN_URL = BASE_URL + '/ums/v2/users/login'
 TEMPLATE_BY_ID_URL = BASE_URL + '/settings/v1/templates/<templateId>'
 DEPLOY_URL = BASE_URL + "/settings/v1/plugins"
 DIST_PATH = "./dist"
-LAST_SESSION_TIME_KEY = env_vars.get("LAST_SESSION_TIME_KEY") if env_vars.get("LAST_SESSION_TIME_KEY") is not None\
+LAST_SESSION_TIME_KEY = env_vars["LAST_SESSION_TIME_KEY"] if "LAST_SESSION_TIME_KEY" in env_vars\
     else "last_session_time"
 
 

@@ -31,8 +31,7 @@ def perform(data, token, traceparent, metadata):
 
     logger.info("Fetching non-adherent patients of every relevant org and creating patient alerts.")
     for id in organizations_map.keys():
-        adherence_time_in_days = iso_string_to_datetime(organizations_map[id]["adherence_time_in_days"])
-        required_last_time = iso_date_x_days_ago(adherence_time_in_days)
+        required_last_time = iso_date_x_days_ago(organizations_map[id]["adherence_time_in_days"])
         alert_template_name = organizations_map[id]["adherence_alert_template_name"]
 
         create_alerts_for_patients(id, required_last_time, alert_template_name, token, traceparent)
