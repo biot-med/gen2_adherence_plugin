@@ -10,7 +10,7 @@ The second plugin, of type Adherence Alert, will run periodically and get all th
 
 ### Plugin Setup
 1. Create a patient alert template for non-adherence alerts.
-2. In the organization template, create an attribute of type label called "Adherence Alert Template Name" (json name "adherence_alert_template_name") and set the value to name of the alert template created in the pervious step.
+2. In the organization template, create an attribute of type label called "Adherence Alert Template Name" (json name "adherence_alert_template_name") and set the value to name of the alert template created in the previous step.
 3. In the organization template, create an attribute of type integer called "Adherence Time in Days" (json name "adherence_time_in_days"). Set the value to be the minimum time in days for non-adherence.
 4. In the patient template, create an attribute named "Last Session Time" of type DATE_TIME. The deployment script will check if this attribute exist and if not, will create one for you.
 5. Environment variables must be configured in the deploy config as described in the "Deployment" section below.
