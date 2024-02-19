@@ -59,7 +59,7 @@ def create_alerts_for_patients(org_id, required_last_time, alert_template_name,\
     # Choose whether to paginate old or new non-adherent patients according to the given flag.
     pagination_func = paginate_non_adherent_patients_by_org
     if new_patients:
-        paginate_new_non_adherent_patients_by_org
+        pagination_func = paginate_new_non_adherent_patients_by_org
 
     # Paginate non-adherent patients in chunks configured by PAGE_SIZE and create alerts for them
     page = 0
