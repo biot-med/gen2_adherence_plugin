@@ -2,9 +2,12 @@
 
 # BioT's Adherence Plugin
 
-The solution is be composed of 2 plugins.
-The first plugin will be executed upon session completion/update and update the last session timestamp of patient attribute.
-The second plugin, of type Adherence Alert, will run periodically and get all the patients that did not complete a session in the last X days. Then it will create an alert for each one.
+The solution is be composed of 2 plugins.  
+The first "Last Session Tracker" plugin, will be triggered upon session completion/update, and update the last session timestamp of patient attribute.  
+The second "Adherence Alert" plugin, will be executed periodically and get all the patients that did not complete a session in the last X days. Then it will create an alert for each patient.  
+Both plugins are deployed under the same function code. When the wrapper function is executed it would trigger the appropriate plugin according to the context.  
+BioT notification would trigger the "Last Session Tracker" plugin.  
+The scheduler will trigger the "Adherence Alert" plugin.
 
 [Read here](https://docs.biot-med.com/docs/biot-plugins) about BioT plugins.
 
@@ -16,6 +19,7 @@ The second plugin, of type Adherence Alert, will run periodically and get all th
 5. Environment variables must be configured in the deploy config as described in the "Deployment" section below.
 
 ### Deployment
+The deployment script deploys both plugins under a single function.  
 - Copy the "deploy_config.py" file from the "deployment template" folder to the main folder.
 - Fill in the required information in the copied "deploy_config.py" file.
 - For the first deployment, set "is_initial" to True and "version" to "1". Otherwise, set "is_initial" to False.
@@ -28,15 +32,15 @@ The second plugin, of type Adherence Alert, will run periodically and get all th
 2. Whenever a change is made, the plugin needs to be redeployed using the provided deployment script.
 
 ### Constants
-
-For running locally you can use local_dev_constants in the constants file.
+To run locally, you can use local_dev_constants in the constants file.
 Just make sure to fill the variables according to the lambda's variables **in the dev environment**
 
-## Supported hooks
-
+## Plugin Subscriptions 
+###Last Session Tracker
 - Notifications - notification services
   - hooktype name: `NOTIFICATION`
-- Other general lambda types not mentioned above
+###Adherence Alert
+- Executed by schedualer so no specific subscription 
   - ( hooktype not required but in the code accessed using `NONSPECIFIC` )
 
 ## Basic code flow
@@ -45,9 +49,9 @@ Just make sure to fill the variables according to the lambda's variables **in th
 
 1. These basic functions run at the beginning of the lambda (you can change them as required):
 
-- `check_request_type(event)` - this function checks the hook type from the event. If the lambda has only one usage this can be removed (along with the following functionsMapper).
+- `check_request_type(event)` - this function checks the hook type from the event. 
 
-- `functions_mapper[request_type]` - This contains the functions from the relevant hook type folder. If you use the lambda for just one of the hooks you can import the functions directly from the folder and delete this line.
+- `functions_mapper[request_type]` - This contains the functions from the relevant hook type folder. 
 
 - `extract_data_from_event` - extract the data, metadata, traceparent and token from the lambda's event (this is diffract for each hook type).
 
@@ -65,8 +69,16 @@ Just make sure to fill the variables according to the lambda's variables **in th
   - In case of interceptors, the data structure is important (follow the data structure supplied for the interceptors in their `create_error_response` function).
   - If you add a new error code, add the error's code name to the constants, add the error response in `create_error_response`, and use `raise Exception(ERROR_CODE_NAME)` where the error occur in your code.
 
-## Environment variables
+## APIs used the plugins
+| Name                 | Type  | URL                                                                                                                                  | Description                       |
+|----------------------|-------|--------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
+| Update Patient       | PATCH | [/organization/v1/users/patients/{id}](https://docs.biot-med.com/reference/updatepatient)                                            | Update the last session timestamp |
+| Search Organization  | GET   | [/organization/v1/organizations](https://docs.biot-med.com/reference/searchorganizations)                                            | Get all organizations             |
+| Search Patient       | GET   | [/organization/v1/users/patients](https://docs.biot-med.com/reference/searchpatients)                                                | Search for non-adherent patients  |
+| Create Patient Alert | POST  | [/organization/v1/users/patients/{patientId}/alerts/{templateName}](https://docs.biot-med.com/reference/createalertbytemplatename-1) | Generate an alert for a patient   |
 
+
+## Environment variables
 **Make sure to define these env variables in your lambda**:
 
 - `BIOT_JWT_PERMISSION_INTERCEPTION` or `BIOT_JWT_PERMISSION_NOTIFICATION` - permissions sent in the token.
@@ -79,7 +91,5 @@ Just make sure to fill the variables according to the lambda's variables **in th
 - `LAST_SESSION_TIME_KEY` - The last session time attribute name as it appears in the patient template.
 
 - `ADHERENCE_SESSION_TEMPLATE_NAME` - The template name of the session that requires adherence.
-
-- `ADHERENCE_TIME_IN_DAYS` - Minimum time in days of not doing a session to trigger non-adherence.
 
 - `ALERT_TEMPLATE_NAME` - The template name of the adherence alert.

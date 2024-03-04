@@ -8,7 +8,7 @@ deploy_vars = {
 
     "display_name": "<The display name of the plugin>",
 
-    "is_initial": False, # Is this the first deployment of the plugin under the given name? True/False
+    "is_initial": False, # Is this the first deployment of the plugin under the given name? True/False. On initial deployment the deployment script will create a new plugin. Later it would update an exisitng one.
 
     "login_username": "<Login username>",
 
@@ -27,7 +27,6 @@ env_vars = {
     "AWS_EXECUTION_ENV": "<Execution environment on AWS>",
     "LAST_SESSION_TIME_KEY": "<The last session time key as it appears in the patient template>",
     "ADHERENCE_SESSION_TEMPLATE_NAME": "<The template name of the session that requires adherence>",
-    "ADHERENCE_TIME_IN_DAYS": "<Minimum time in days of not doing a session to trigger non-adherence>",
     "ALERT_TEMPLATE_NAME": "<The template name of the adherence alert>",
     # In a similar manner, add the rest of your lambda's environment variables here.
 }

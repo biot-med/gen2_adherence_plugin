@@ -33,7 +33,6 @@ cloud_constants = {
     },
     "JWT_PERMISSION": os.getenv("JWT_PERMISSION"),
     "ADHERENCE_SESSION_TEMPLATE_NAME": os.getenv("ADHERENCE_SESSION_TEMPLATE_NAME"),
-    "ADHERENCE_TIME_IN_DAYS": os.getenv("ADHERENCE_TIME_IN_DAYS"),
     "ALERT_TEMPLATE_NAME": os.getenv("ALERT_TEMPLATE_NAME"),
     "LAST_SESSION_TIME_KEY": os.getenv("LAST_SESSION_TIME_KEY") if os.getenv("LAST_SESSION_TIME_KEY") is not None\
         else "last_session_time"
@@ -55,7 +54,6 @@ local_dev_constants = {
     },
     "JWT_PERMISSION": None,
     "ADHERENCE_SESSION_TEMPLATE_NAME": None,
-    "ADHERENCE_TIME_IN_DAYS": None,
     "ALERT_TEMPLATE_NAME": None,
     "LAST_SESSION_TIME_KEY": "last_session_time"
 }
@@ -79,6 +77,5 @@ BIOT_SHOULD_VALIDATE_JWT = environment_constants["BIOT_SHOULD_VALIDATE_JWT"]
 BIOT_SERVICE_ENVIRONMENT = environment_constants["BIOT_SERVICE_ENVIRONMENT"]
 HOOKTYPE_PERMISSIONS = environment_constants["HOOKTYPE_PERMISSIONS"]
 ADHERENCE_SESSION_TEMPLATE_NAME = environment_constants["ADHERENCE_SESSION_TEMPLATE_NAME"]
-ADHERENCE_TIME_IN_DAYS = environment_constants["ADHERENCE_TIME_IN_DAYS"]
 ALERT_TEMPLATE_NAME = environment_constants["ALERT_TEMPLATE_NAME"]
 LAST_SESSION_TIME_KEY = environment_constants["LAST_SESSION_TIME_KEY"]
