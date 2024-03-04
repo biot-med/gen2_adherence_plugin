@@ -69,7 +69,7 @@ Just make sure to fill the variables according to the lambda's variables **in th
   - In case of interceptors, the data structure is important (follow the data structure supplied for the interceptors in their `create_error_response` function).
   - If you add a new error code, add the error's code name to the constants, add the error response in `create_error_response`, and use `raise Exception(ERROR_CODE_NAME)` where the error occur in your code.
 
-## APIs used the plugins
+## APIs used in the plugins
 | Name                 | Type  | URL                                                                                                                                  | Description                       |
 |----------------------|-------|--------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
 | Update Patient       | PATCH | [/organization/v1/users/patients/{id}](https://docs.biot-med.com/reference/updatepatient)                                            | Update the last session timestamp |
