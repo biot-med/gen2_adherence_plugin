@@ -20,7 +20,7 @@ LOGIN_URL = BASE_URL + '/ums/v2/users/login'
 TEMPLATE_BY_ID_URL = BASE_URL + '/settings/v1/templates/<templateId>'
 DEPLOY_URL = BASE_URL + "/settings/v1/plugins"
 DIST_PATH = "./dist"
-LAST_SESSION_TIME_KEY = env_vars["LAST_SESSION_TIME_KEY"] if "LAST_SESSION_TIME_KEY" in env_vars\
+LAST_SESSION_TIME_ATTRIBUTE = env_vars["LAST_SESSION_TIME_ATTRIBUTE"] if "LAST_SESSION_TIME_ATTRIBUTE" in env_vars\
     else "last_session_time"
 
 
@@ -64,7 +64,7 @@ def update_patient_template(patient_template, headers):
         customAttributes = patient_template.get('customAttributes')\
               if patient_template.get('customAttributes') is not None else []
         
-        if len(list(filter(lambda e: e["name"] == LAST_SESSION_TIME_KEY, customAttributes))) > 0:
+        if len(list(filter(lambda e: e["name"] == LAST_SESSION_TIME_ATTRIBUTE, customAttributes))) > 0:
             print("Patient template already has a last session time attribute.")
             return
         
@@ -74,7 +74,7 @@ def update_patient_template(patient_template, headers):
             attribute["category"] = attribute["category"]["name"]
         
         customAttributes.append({
-            "name": LAST_SESSION_TIME_KEY,
+            "name": LAST_SESSION_TIME_ATTRIBUTE,
             "displayName": "last session time",
             "category": "REGULAR",
             "type": "DATE_TIME",

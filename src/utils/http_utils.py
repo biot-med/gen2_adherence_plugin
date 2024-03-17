@@ -166,7 +166,7 @@ def _request(method, url, traceparent, token=None, body=None, query_params=None,
          dict: response.
      """
 
-    logger.info("Sending http request: ", {"method": method, "url": url, "query_params": query_params,
+    logger.debug("Sending http request: ", {"method": method, "url": url, "query_params": query_params,
                                            "body": body, "headers": headers})
 
     try:
@@ -181,7 +181,7 @@ def _request(method, url, traceparent, token=None, body=None, query_params=None,
         if response is None:
             raise Exception("No response returned")
         else:
-            logger.info("Received http response: ", {"status code": response.status_code, "body": response.text,
+            logger.debug("Received http response: ", {"status code": response.status_code, "body": response.text,
                                                      "headers": response.headers})
 
         if response.status_code not in range(200, 299):

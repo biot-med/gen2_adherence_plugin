@@ -2,46 +2,45 @@
 
 # BioT's Adherence Plugin
 
-The solution is be composed of 2 plugins.  
-The first "Last Session Tracker" plugin, will be triggered upon session completion/update, and update the last session timestamp of patient attribute.  
-The second "Adherence Alert" plugin, will be executed periodically and get all the patients that did not complete a session in the last X days. Then it will create an alert for each patient.  
-Both plugins are deployed under the same function code. When the wrapper function is executed it would trigger the appropriate plugin according to the context.  
-BioT notification would trigger the "Last Session Tracker" plugin.  
-The scheduler will trigger the "Adherence Alert" plugin.
+The solution is be composed of 2 plugins.   
+The first "Last Session Tracker" plugin, will be triggered upon session completion/update, and update the last session timestamp of patient attribute.     
+The second "Adherence Alert" plugin, will be executed periodically and get all the patients that did not complete a session in the last X days. Then it will create an alert for each patient.     
+Both plugins are deployed under the same function code. When the wrapper function is executed it would trigger the appropriate plugin according to the context.     
+BioT notification would trigger the "Last Session Tracker" plugin.    
+The scheduler will trigger the "Adherence Alert" plugin.  
 
 [Read here](https://docs.biot-med.com/docs/biot-plugins) about BioT plugins.
 
 ### Plugin Setup
-1. Create a patient alert template for non-adherence alerts.
-2. In the organization template, create an attribute of type label called "Adherence Alert Template Name" (json name "adherence_alert_template_name") and set the value to name of the alert template created in the previous step.
-3. In the organization template, create an attribute of type integer called "Adherence Time in Days" (json name "adherence_time_in_days"). Set the value to be the minimum time in days for non-adherence.
-4. In the patient template, create an attribute named "Last Session Time" of type DATE_TIME. The deployment script will check if this attribute exist and if not, will create one for you.
-5. Environment variables must be configured in the deploy config as described in the "Deployment" section below.
+1. Create a patient alert template for non-adherence alerts.   
+2. In the organization template, create an attribute of type label called "Adherence Alert Template Name" (json name "adherence_alert_template_name") and set the value to name of the alert template created in the previous step.   
+3. In the organization template, create an attribute of type integer called "Adherence Time in Days" (json name "adherence_time_in_days"). Set the value to be the minimum time in days for non-adherence.   
+4. In the patient template, create an attribute named "Last Session Time" of type DATE_TIME. The deployment script will check if this attribute exist and if not, will create one for you.   
+5. Environment variables must be configured in the deploy config as described in the "Deployment" section below.   
+   
+### Deployment   
+The deployment script deploys both plugins under a single function.      
+- Fill in the required information in the "deploy_config.py" file under the scripts folder.   
+- For the first deployment, set "is_initial" to True and "version" to "1". Otherwise, set "is_initial" to False.   
+- You can add any additional environment variables in the "env_vars" dictionary.   
+- Run `python scripts/deploy.py`   
+- A scheduler need to be configured for the alert plugin to work. Contact BioT support for help.   
 
-### Deployment
-The deployment script deploys both plugins under a single function.  
-- Copy the "deploy_config.py" file from the "deployment template" folder to the main folder.
-- Fill in the required information in the copied "deploy_config.py" file.
-- For the first deployment, set "is_initial" to True and "version" to "1". Otherwise, set "is_initial" to False.
-- You can add any additional environment variables in the "env_vars" dictionary.
-- Run `python scripts/deploy.py`
-- A scheduler need to be configured for the alert plugin to work. Contact BioT support for help.
+### Maintenance Notes   
+1. All additional dependencies must be compatible with AWS Lambda execution environment as explained in: https://docs.aws.amazon.com/lambda/latest/dg/python-package.html#python-package-native-libraries.   
+2. Whenever a change is made, the plugin needs to be redeployed using the provided deployment script.   
 
-### Maintenance Notes
-1. All additional dependencies must be compatible with AWS Lambda execution environment as explained in: https://docs.aws.amazon.com/lambda/latest/dg/python-package.html#python-package-native-libraries.
-2. Whenever a change is made, the plugin needs to be redeployed using the provided deployment script.
-
-### Constants
-To run locally, you can use local_dev_constants in the constants file.
-Just make sure to fill the variables according to the lambda's variables **in the dev environment**
+### Constants   
+To run locally, you can use local_dev_constants in the constants file.   
+Just make sure to fill the variables according to the lambda's variables **in the dev environment**   
 
 ## Plugin Subscriptions 
-###Last Session Tracker
-- Notifications - notification services
-  - hooktype name: `NOTIFICATION`
-###Adherence Alert
-- Executed by schedualer so no specific subscription 
-  - ( hooktype not required but in the code accessed using `NONSPECIFIC` )
+###Last Session Tracker   
+- Notifications - notification services   
+  - hooktype name: `NOTIFICATION`   
+###Adherence Alert   
+- Executed by schedualer so no specific subscription    
+  - ( hooktype not required but in the code accessed using `NONSPECIFIC` )   
 
 ## Basic code flow
 
@@ -88,7 +87,7 @@ Just make sure to fill the variables according to the lambda's variables **in th
 
 - `BIOT_SHOULD_VALIDATE_JWT` - This should be false if the service does not need to validate the JWT.
 
-- `LAST_SESSION_TIME_KEY` - The last session time attribute name as it appears in the patient template.
+- `LAST_SESSION_TIME_ATTRIBUTE` - The last session time attribute name as it appears in the patient template.
 
 - `ADHERENCE_SESSION_TEMPLATE_NAME` - The template name of the session that requires adherence.
 

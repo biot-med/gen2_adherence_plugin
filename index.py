@@ -8,7 +8,7 @@ from src.index import logger, check_request_type, functions_mapper, BIOT_SHOULD_
 
 def handler(event, lambda_context=None):
     # The following two logs are just for debugging. You should remove them as soon as you can, the token should not be printed to logs.
-    logger.info("At Lambda start, got event: ", event)
+    logger.debug("At Lambda start, got event: ", event)
 
     traceparent = "traceparent-not-set"
 

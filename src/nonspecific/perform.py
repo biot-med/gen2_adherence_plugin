@@ -1,6 +1,6 @@
 from src.utils.configure_logger import logger
 from src.utils.generic_success_response import generic_success_response
-from src.utils.api import get_all_organizations, paginate_non_adherent_patients_by_org,\
+from src.utils.biot_api import get_all_organizations, paginate_non_adherent_patients_by_org,\
     paginate_new_non_adherent_patients_by_org, create_patient_alert
 from src.utils.date_utils import iso_date_x_days_ago, iso_string_to_datetime
 from src.constants import PAGE_SIZE
@@ -18,7 +18,7 @@ def perform(data, token, traceparent, metadata):
         dict: A generic success response in case of a successful execution.
     """    
 
-    logger.info("Get all organizations and cache their adherence parameters into a map.")
+    logger.debug("Get all organizations and cache their adherence parameters into a map.")
     organizations = get_all_organizations(token, traceparent)
     organizations_map = {}
     for org in organizations:
@@ -27,9 +27,9 @@ def perform(data, token, traceparent, metadata):
                 "adherence_time_in_days": org["adherence_time_in_days"],
                 "adherence_alert_template_name": org["adherence_alert_template_name"]
             }
-    logger.info(f"Mapped the adherence parameters of {len(organizations_map.keys())} organizations.")
+    logger.debug(f"Mapped the adherence parameters of {len(organizations_map.keys())} organizations.")
 
-    logger.info("Fetching non-adherent patients of every relevant org and creating patient alerts.")
+    logger.debug("Fetching non-adherent patients of every relevant org and creating patient alerts.")
     for id in organizations_map.keys():
         required_last_time = iso_date_x_days_ago(organizations_map[id]["adherence_time_in_days"])
         alert_template_name = organizations_map[id]["adherence_alert_template_name"]
