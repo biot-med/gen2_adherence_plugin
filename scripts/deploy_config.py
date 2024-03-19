@@ -2,13 +2,17 @@ deploy_vars = {
 
     "base_url": "<Base url for deployment - can be obtained from the BioT console -> Setting menu -> Technical Information -> Rest API URL>",
 
-    "version": "<Plugin initial version>", # only useful if is_initial is set to True
+    "version": "1", # only useful if is_initial is set to True
 
-    "name": "<The name of the plugin>",
+    "alert_plugin_name": "adherence_alert",
 
-    "display_name": "<The display name of the plugin>",
+    "session_tracker_plugin_name": "last_session_tracker",
 
-    "is_initial": False, # Is this the first deployment of the plugin under the given name? True/False. On initial deployment the deployment script will create a new plugin. Later it would update an exisitng one.
+    "alert_plugin_display_name": "Adherence Alert",
+
+    "session_tracker_display_name": "Last Session Tracker",
+
+    "is_initial": True, # Is this the first deployment of the plugin under the given name? True/False. On initial deployment the deployment script will create a new plugin. Later it would update an exisitng one.
 
     "login_username": "<Manufacturer Admin Login username>",
 
@@ -24,7 +28,7 @@ deploy_vars = {
 }
 
 env_vars = {
-    "AWS_EXECUTION_ENV": "<Execution environment on AWS>", # set to 'DEV' when deploying in your development environment
+    "AWS_EXECUTION_ENV": "DEV", # set to 'DEV' when deploying in your development environment
     "LAST_SESSION_TIME_ATTRIBUTE": "<The last session time key as it appears in the patient template>",
     "ADHERENCE_SESSION_TEMPLATE_NAME": "<The template name of the session that requires adherence>",
     "ALERT_TEMPLATE_NAME": "<The template name of the adherence alert>",

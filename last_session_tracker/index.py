@@ -30,10 +30,6 @@ def handler(event, lambda_context=None):
         # Note: Some of these properties might not be relevant for certain cases, you can remove them if they are not relevant
         #       For example, metadata does not exist in interceptors' events.
         extracted_data = extract_data_from_event(event)
-        if "scheduled" in extracted_data and extracted_data["scheduled"] is True:
-            traceparent = create_traceparent()
-            return perform(None, login(traceparent), traceparent, None)
-        
         data = extracted_data["data"] if "data" in extracted_data else None
         event_token = extracted_data["event_token"] if "event_token" in extracted_data else None
         event_traceparent = extracted_data["event_traceparent"] if "event_traceparent" in extracted_data else None

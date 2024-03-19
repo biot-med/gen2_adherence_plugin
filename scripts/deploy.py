@@ -4,7 +4,7 @@ import shutil
 import json
 import traceback
 from urllib.parse import quote
-from distutils.dir_util import copy_tree
+from distutils import dir_util
 import sys
 
 current = os.path.dirname(os.path.realpath(__file__))
@@ -28,10 +28,11 @@ def clear_artifacts():
     print("Cleaning deployment artifacts.")
     os.remove("./plugin.zip")
     shutil.rmtree(DIST_PATH)
+
     print("Cleaned deployment artifacts.")
 
 
-def find_patient_template(headers):
+def find_patient_template(headers, requests):
     print("Search for default patient template by name " + str(DEFAULT_PATIENT_TEMPLATE_NAME))
     try:
         searchQuery = {
@@ -58,7 +59,7 @@ def find_patient_template(headers):
         print(e)
 
 
-def update_patient_template(patient_template, headers):
+def update_patient_template(patient_template, headers, requests):
     print("Updating patient template")
     try:
         customAttributes = patient_template.get('customAttributes')\
@@ -106,19 +107,23 @@ def update_patient_template(patient_template, headers):
         print(e)
 
 
-def deployment_setup():
+def deployment_setup(plugin_name):
     if not os.path.exists(DIST_PATH):
         print("Creating deployment dir.")
         os.makedirs(DIST_PATH)
         print("Created deployment dir.")
+
+    current_directory = os.getcwd()
+    print("CWD: " + current_directory)
 
     print(f"Installing dependencies at deployment dir.")
     subprocess.run(f"pip install -r requirements.txt --target " + DIST_PATH, shell=True)
     print(f"Installed dependencies at deployment dir.")
 
     print("Copying the plugin into the deployment dir.")
-    copy_tree('./src', DIST_PATH + "/src")
-    shutil.copyfile("./index.py", DIST_PATH + "/index.py") 
+    dir_util._path_created = {} # clear the path cache, so new dir will be created
+    dir_util.copy_tree(f'./{plugin_name}/src', DIST_PATH + "/src")
+    shutil.copyfile(f'./{plugin_name}/index.py', DIST_PATH + "/index.py")
     print("Successfully copied the plugin into the deployment dir.")
 
     print("Zipping plugin deployment dir.")
@@ -126,10 +131,10 @@ def deployment_setup():
     print("Successfully zipped plugin deployment dir.")
 
 
-def create_configuration_payload():
+def create_configuration_payload(plugin_name, plugin_display_name, version, subscribe):
     return {
-        "name": deploy_vars["name"],
-        "displayName": deploy_vars["display_name"],
+        "name": plugin_name,
+        "displayName": plugin_display_name,
         "version": version,
         "runtime": deploy_vars["runtime"],
         "timeout": deploy_vars["timeout"],
@@ -148,15 +153,42 @@ def create_configuration_payload():
                     "actionName":"_update"
                 }
             ]
-        }
+        } if subscribe else {}
     }
 
+def deploy_plugin_file(plugin_name, plugin_display_name, headers, requests, subscribe):
+    deploy_url = DEPLOY_URL
+    if deploy_vars["is_initial"]:
+        request = requests.post
+        version = deploy_vars["version"]
+    else:
+        request = requests.put
+        deploy_url = deploy_url + "/Plugin-" + plugin_name
+        print("Fetching the plugin's latest version number.")
+        version_res = requests.get(url=deploy_url, headers=headers)
+        old_version = int(version_res.json()["version"])
+        version = old_version + 1
+        print(f"Fetched version. Current version: {old_version}, new version: {version}.")
 
-try: 
-    print("****BEGIN DEPLOYMENT****")
+    print("Deploying plugin.")
+    config_payload = create_configuration_payload(plugin_name, plugin_display_name, version, subscribe)
 
-    deployment_setup()
+    plugin_zip = open("plugin.zip", "rb")
 
+    deploy_payload = {
+        "code": ("plugin.zip", plugin_zip, "gzip, deflate, br"),
+        "configuration": json.dumps(config_payload)
+    }
+
+    deploy_res = request(url=deploy_url, files=deploy_payload, headers=headers)
+    plugin_zip.close()
+    print("Deployed plugin with response: ", deploy_res.text)
+
+    clear_artifacts()
+
+def deploy_plugin(plugin_name, plugin_display_name, subscribe):
+    print("Deploying " + plugin_name)
+    deployment_setup(plugin_name)
     from dist import requests
 
     print("Logging in and getting deployment access token.")
@@ -174,38 +206,17 @@ try:
         "authorization": "Bearer " + access_token
     }
 
-    patient_template = find_patient_template(headers)
-    update_patient_template(patient_template, headers)
+    patient_template = find_patient_template(headers, requests)
+    update_patient_template(patient_template, headers, requests)
 
-    deploy_url = DEPLOY_URL
+    deploy_plugin_file(plugin_name, plugin_display_name, headers, requests, subscribe)
 
-    if deploy_vars["is_initial"]:
-        request = requests.post
-        version = deploy_vars["version"]
-    else:
-        request = requests.put
-        deploy_url = deploy_url + "/Plugin-" + deploy_vars["name"]
-        print("Fetching the plugin's latest version number.")
-        version_res = requests.get(url=deploy_url, headers=headers)
-        old_version = int(version_res.json()["version"])
-        version = old_version + 1
-        print(f"Fetched version. Current version: {old_version}, new version: {version}.")
+try: 
+    print("****BEGIN DEPLOYMENT****")
 
-    print("Deploying plugin.")
-    config_payload = create_configuration_payload()
+    deploy_plugin(deploy_vars["session_tracker_plugin_name"], deploy_vars["session_tracker_display_name"], True)
+    deploy_plugin(deploy_vars["alert_plugin_name"], deploy_vars["alert_plugin_display_name"], False)
 
-    plugin_zip = open("plugin.zip", "rb")
-
-    deploy_payload = {
-        "code": ("plugin.zip", plugin_zip, "gzip, deflate, br"),
-        "configuration": json.dumps(config_payload)
-    }
-
-    deploy_res = request(url=deploy_url, files=deploy_payload, headers=headers)
-    plugin_zip.close()
-    print("Deployed plugin with response: ", deploy_res.text)
-
-    clear_artifacts()
     print("****FINISHED DEPLOYMENT****")
 
 except Exception:
